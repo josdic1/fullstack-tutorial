@@ -23,11 +23,16 @@ function Login() {
     console.log(result)
   }
 
+  const setLogin = () => {
+    setUsername('storres');
+    setPassword('password123');
+  }
 
 
 return (
   <>
     <div style={{ maxWidth: '400px', margin: '50px auto' }}>
+      <button type='button' onClick={setLogin}>Test Login</button>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>

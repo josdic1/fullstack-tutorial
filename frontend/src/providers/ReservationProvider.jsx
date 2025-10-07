@@ -60,12 +60,55 @@ useEffect(() => {
     }
 }
 
+const updateReservation = async (updatedData) => {
+    try {
+        const response = await fetch(`http://localhost:5555/api/reservations/${updatedData.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedData)
+        })
+        
+        if (response.ok) {
+            const updatedReservation = await response.json()
+            setReservations(prev => prev.map(r => r.id === updatedData.id ? updatedReservation : r))
+            return true
+        }
+        return false
+    } catch (error) {
+        console.error('Error updating reservation:', error)
+        return false
+    }
+}
+
+const deleteReservation = async (id) => {
+    try {
+        const response = await fetch(`http://localhost:5555/api/reservations/${id}`, {
+            method: 'DELETE',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+        
+        if (response.ok) {  // ✅ Check if deletion was successful
+            setReservations(prev => prev.filter(r => r.id !== id))
+            return true  // ✅ SUCCESS
+        }
+        return false  // ✅ FAILED
+    } catch (error) {
+        console.error('Error deleting reservation:', error)
+        return false  // ✅ ERROR
+    }
+}
+
     
 
 return (
 <>
     <ReservationContext.Provider 
-        value={{ reservations, fetchReservations, createReservation }}>
+        value={{ reservations, fetchReservations, createReservation, updateReservation, deleteReservation }}>
             {children}
     </ReservationContext.Provider>
 </>

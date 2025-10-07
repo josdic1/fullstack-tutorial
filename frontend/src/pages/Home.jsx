@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { Navigate } from 'react-router-dom'
 import AuthContext from '../contexts/AuthContext'
+import ReservationList from './ReservationList'
 
 function Home() {
   const { user, logout } = useContext(AuthContext)

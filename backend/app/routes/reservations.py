@@ -100,6 +100,26 @@ def get_reservation(reservation_id):
     
     return reservation.to_dict(rules=('-member.reservations', '-fees.reservation', '-member_notes.reservation')), 200
 
+@reservations_bp.route('/<int:reservation_id>', methods=['DELETE'])
+@jwt_required()
+def delete_reservation(reservation_id):
+    """Delete a reservation"""
+    member_id = int(get_jwt_identity())
+    member = Member.query.get(member_id)
+    
+    reservation = Reservation.query.get(reservation_id)
+    
+    if not reservation:
+        return {'error': 'Reservation not found'}, 404
+    
+    if reservation.member_id != member_id and member.role != 'staff':
+        return {'error': 'Unauthorized'}, 403
+    
+    db.session.delete(reservation)
+    db.session.commit()
+    
+    return {'message': 'Reservation deleted'}, 200
+
 @reservations_bp.route('/<int:reservation_id>/status', methods=['PATCH'])
 @jwt_required()
 def update_reservation_status(reservation_id):
