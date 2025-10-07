@@ -24,8 +24,8 @@ function Login() {
   }
 
   const setLogin = () => {
-    setUsername('storres');
-    setPassword('password123');
+    setUsername('josh');
+    setPassword('pass');
   }
 
 

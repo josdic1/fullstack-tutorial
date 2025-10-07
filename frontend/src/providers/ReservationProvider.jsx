@@ -69,13 +69,15 @@ const updateReservation = async (updatedData) => {
         })
         
         if (response.ok) {
-            const { reservation } = await response.json()  // ✅ Destructure
-            setReservations(prev => prev.map(r => 
-                r.id === updatedData.id ? reservation : r
-            ))
-            return true
+            const { reservation } = await response.json()
+            setReservations(prev => prev.map(r => r.id === updatedData.id ? reservation : r))
+            return true  // ✅ Success
         }
+        
+        // ❌ ADD THIS - explicitly return false on failure
+        console.error('Update failed:', response.status)
         return false
+        
     } catch (error) {
         console.error('Error updating reservation:', error)
         return false

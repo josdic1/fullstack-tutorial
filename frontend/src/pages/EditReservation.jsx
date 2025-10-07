@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react"
-import { useParams, useNavigate, useOutletContext } from "react-router-dom"  // ✅ Add useOutletContext
+import { useParams, useNavigate, useOutletContext } from "react-router-dom"  
 import AuthContext from "../contexts/AuthContext"
 import ReservationContext from "../contexts/ReservationContext"
 
@@ -19,22 +19,27 @@ function EditReservation() {
     
     const navigate = useNavigate()
 
-    useEffect(() => {
-        const reservation = reservations.find(r => r.id === parseInt(id))
-        if (!reservation) {
-            navigate("/reservations")
-        } else {
-            setFormData(reservation)
-        }
-    }, [id, reservations, navigate])
-
-    const onFormChange = (e) => {
-        const { name, value } = e.target
-        setFormData(prev => ({
-            ...prev,
-            [name]: name === 'party_size' ? parseInt(value) || 1 : value
-        }))
+useEffect(() => {
+    const reservation = reservations.find(r => r.id === parseInt(id))
+    if (!reservation) {
+        navigate("/")
+    } else {
+        // ✅ Ensure status has a default value
+        setFormData({
+            ...reservation,
+            status: reservation.status || 'pending'  // Fallback to 'pending'
+        })
     }
+}, [id, reservations, navigate])
+
+const onFormChange = (e) => {
+    const { name, value } = e.target
+    console.log('🔄 Field changed:', name, '=', value)  // ✅ Debug
+    setFormData(prev => ({
+        ...prev,
+        [name]: name === 'party_size' ? parseInt(value) || 1 : value
+    }))
+}
 
     async function onSubmit(e) {
         e.preventDefault()
@@ -60,6 +65,17 @@ function EditReservation() {
             showToast('Please fill in all required fields', 'error')  // ✅ Toast instead of alert
             return
         }
+
+        // rerender with updated data
+        const updatedFormData = {
+            ...formData,
+            reservation_date: formData.reservation_date,
+            reservation_time: formData.reservation_time,
+            party_size: parseInt(formData.party_size),
+            notes: formData.notes,
+            status: formData.status
+        }
+        setFormData(updatedFormData)
         
         // Wait for API call
         const success = await updateReservation(formData)
@@ -67,7 +83,7 @@ function EditReservation() {
         if (success) {
             showToast('Reservation updated successfully!', 'success')  // ✅ Toast instead of alert
             onClear()
-            navigate('/reservations')  // ✅ Changed from '/' to '/reservations'
+            navigate('/')  // ✅ Changed from '/' to '/reservations'
         } else {
             showToast('Failed to update reservation', 'error')  // ✅ Toast instead of alert (also fixed message)
         }
@@ -84,7 +100,7 @@ function EditReservation() {
     }
 
     const onCancel = () => {
-        navigate('/reservations')
+        navigate('/')
     }
 
     return (
@@ -126,15 +142,16 @@ function EditReservation() {
                     </textarea>
                     </label>
                     <label>Status:
-                    <select 
-                        name="status" 
-                        onChange={onFormChange}
-                        value={formData.status}
-                        required>
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="cancelled">Cancelled</option>
-                    </select>
+               <select 
+    name="status" 
+    onChange={onFormChange}
+    value={formData.status}
+    required>
+        <option value="pending">Pending</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="cancelled">Cancelled</option>
+</select>
+<p>Current status: {formData.status}</p> 
                     </label>    
                 </div>
                 <div>

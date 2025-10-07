@@ -167,6 +167,9 @@ def update_reservation(reservation_id):
             note_text=data['notes']
         )
         db.session.add(note)
+
+    if 'status' in data:
+        reservation.status = data['status']
     
     db.session.commit()
     

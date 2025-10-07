@@ -8,15 +8,11 @@ function Home() {
   const { user, logout } = useContext(AuthContext)
   const { reservations } = useContext(ReservationContext)
   
-  // ✅ ADD THESE DEBUG LOGS
-  console.log('👤 User:', user)
-  console.log('📋 All reservations:', reservations)
-  console.log('🔍 User ID type:', typeof user?.id, user?.id)
-  console.log('🔍 First reservation member_id type:', typeof reservations[0]?.member_id, reservations[0]?.member_id)
+  
   
   const userReservations = reservations.filter(r => r.member_id === user?.id)
   
-  console.log('✅ Filtered user reservations:', userReservations)
+ 
   
   const [showOnlyMine, setShowOnlyMine] = useState(true)
 
