@@ -6,14 +6,6 @@ from datetime import datetime
 
 reservations_bp = Blueprint('reservations', __name__)
 
-@reservations_bp.route('', methods=['GET'])
-@jwt_required()
-def get_all_reservations():
-    reservations = Reservation.query.all()  # Everyone gets all
-    return {
-        'reservations': [r.to_dict() for r in reservations]
-    }, 200
-
 @reservations_bp.route('', methods=['POST'])
 @jwt_required()
 def create_reservation():

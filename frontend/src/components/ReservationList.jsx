@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import { useNavigate, useOutletContext } from "react-router-dom"  // ✅ Add useOutletContext
 import ReservationContext from "../contexts/ReservationContext"
-import ReservationCard from "../pages/ReservationCard"
+import ReservationCard from '../components/ReservationCard'
 
 function ReservationList({ reservations = [] }) {
     const { deleteReservation } = useContext(ReservationContext)
@@ -33,6 +33,7 @@ function ReservationList({ reservations = [] }) {
                     <th>Created on</th>
                     <th>Modified on</th>
                     <th>Actions</th>
+                    <th>Res ID</th>
                 </tr>
             </thead>
             <tbody>

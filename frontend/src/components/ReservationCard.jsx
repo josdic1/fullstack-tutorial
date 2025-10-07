@@ -37,6 +37,7 @@ return (
          <button id={reservation.id}  name='update' onClick={onClick}>Update</button>
         <button id={reservation.id} name='delete' onClick={onClick}>Delete</button>
     </td>
+    <td>{reservation.id}</td>
 </tr>
 
 )}
