@@ -8,10 +8,11 @@ function ReservationProvider({children}) {
 
 console.log(reservations)
 
-    useEffect(() => {
-        // Fetch reservations from API when component mounts
+useEffect(() => {
+    if (token) {  // ✅ Only fetch if token exists
         fetchReservations()
-    }, [token])
+    }
+}, [token])
 
     const fetchReservations = async () => {
     try {
@@ -35,25 +36,29 @@ console.log(reservations)
 }
 
     const createReservation = async (reservationData) => {
-        try {
-            const response = await fetch('http://localhost:5555/api/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(reservationData)
-            })
-            
-            if (response.ok) {
-                const newReservation = await response.json()
-                setReservations(prev => [...prev, newReservation])
-            }
-        } catch (error) {
-            console.error('Error creating reservation:', error)
+    console.log('Sending:', reservationData)  // Move log to top
+    
+    try {
+        const response = await fetch('http://localhost:5555/api/reservations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(reservationData)
+        })
+        
+        if (response.ok) {
+            const newReservation = await response.json()
+            setReservations(prev => [...prev, newReservation])
+            return true  // ✅ SUCCESS
         }
-        console.log('Sending:', reservationData)
+        return false  // ✅ FAILED
+    } catch (error) {
+        console.error('Error creating reservation:', error)
+        return false  // ✅ ERROR
     }
+}
 
     
 
