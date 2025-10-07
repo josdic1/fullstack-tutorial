@@ -5,10 +5,10 @@ import AuthContext from '../contexts/AuthContext'
 function Home() {
   const { user, logout } = useContext(AuthContext)
 
-  console.log('Home component - user:', user)  // ← Add this
+
 
   if (!user) {
-    console.log('No user, redirecting to login')  // ← Add this
+
     return <Navigate to="/login" />
   }
 

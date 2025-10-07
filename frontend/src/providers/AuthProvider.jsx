@@ -35,8 +35,11 @@ function AuthProvider({ children }) {
       setLoading(false)
     }
     
+    
     loadUser()
   }, [])
+
+  
 
   const login = async (username, password) => {
     try {

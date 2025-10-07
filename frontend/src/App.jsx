@@ -1,18 +1,15 @@
 import { Outlet } from 'react-router-dom'
 import AuthProvider from './providers/AuthProvider'
+import Navbar from './components/Navbar'
 
 function App() {
   return (
-    <>
-      <header style={{ padding: '20px', background: '#333', color: 'white' }}>
-        <h1>Catering App</h1>
-      </header>
-      <AuthProvider>
+    <AuthProvider>
+      <Navbar />
       <main>
         <Outlet />
       </main>
     </AuthProvider>
-    </>
   )
 }
 
