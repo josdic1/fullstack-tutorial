@@ -24,9 +24,9 @@ function App() {
             onClose={() => setToast(null)}
           />
         )}
-        <main>
-          <Outlet context={{ showToast }} />  {/* ✅ Pass showToast here */}
-        </main>
+   <main style={{ minHeight: 'calc(100vh - 80px)' }}>  {/* 80px = navbar height */}
+  <Outlet context={{ showToast }} />
+</main>
       </ReservationProvider>
     </AuthProvider>
   )

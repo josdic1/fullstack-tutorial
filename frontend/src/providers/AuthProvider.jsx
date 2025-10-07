@@ -80,12 +80,26 @@ function AuthProvider({ children }) {
     localStorage.removeItem('token')
   }
 
-  if (loading) {
-    return <div>Loading...</div>  // Show loading while checking token
-  }
+if (loading) {
+  return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh',
+      backgroundColor: '#f5f5f5',  // ✅ Match body color
+      fontSize: '20px',
+      color: '#333'
+    }}>
+      <div>
+        <p>Loading...</p>
+      </div>
+    </div>
+  )
+}
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

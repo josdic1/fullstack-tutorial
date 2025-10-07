@@ -33,9 +33,11 @@ return (
     <td>{reservation.created_at}</td>
     <td>{reservation.updated_at}</td>
     <td>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
         <button name='view' onClick={onClick}>View</button>
          <button id={reservation.id}  name='update' onClick={onClick}>Update</button>
         <button id={reservation.id} name='delete' onClick={onClick}>Delete</button>
+        </div>
     </td>
     <td>{reservation.id}</td>
 </tr>

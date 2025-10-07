@@ -154,10 +154,10 @@ const onFormChange = (e) => {
 <p>Current status: {formData.status}</p> 
                     </label>    
                 </div>
-                <div>
-                    <button type="submit">Update Reservation</button>
-                    <button type="button" onClick={onCancel}>Cancel</button>
-                </div>
+               <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+  <button type="submit">Update Reservation</button>
+  <button type="button" onClick={onCancel}>Cancel</button>
+</div>
             </form>
         </>
     )

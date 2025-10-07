@@ -6,6 +6,7 @@ from datetime import datetime
 
 reservations_bp = Blueprint('reservations', __name__)
 
+# --- POST --- #
 @reservations_bp.route('', methods=['POST'])
 @jwt_required()
 def create_reservation():
@@ -64,10 +65,11 @@ def create_reservation():
     # Manual serialization to avoid recursion
     return {
         'message': 'Reservation created successfully',
-        'reservation': reservation.to_dict(rules=('-member', '-fees', '-member_notes')),
+        'reservation': reservation.to_dict(rules=('-member',)),  # ✅ Include fees & notes
         'total_fees': float(reservation.calculate_total_fees())
     }, 201
 
+# --- GET --- #
 @reservations_bp.route('', methods=['GET'])
 @jwt_required()
 def get_reservations():
@@ -81,25 +83,27 @@ def get_reservations():
         reservations = Reservation.query.filter_by(member_id=member_id).order_by(Reservation.reservation_date.desc()).all()
     
     return {
-        'reservations': [r.to_dict(rules=('-member', '-fees', '-member_notes')) for r in reservations]
+        'reservations': [r.to_dict(rules=('-member',)) for r in reservations]  # ✅ Include fees & notes
     }, 200
 
-# @reservations_bp.route('/<int:reservation_id>', methods=['GET'])
-# @jwt_required()
-# def get_reservation(reservation_id):
-#     """Get a specific reservation"""
-#     member_id = int(get_jwt_identity())
-#     reservation = Reservation.query.get(reservation_id)
+# --- GET --- #
+@reservations_bp.route('/<int:reservation_id>', methods=['GET'])
+@jwt_required()
+def get_reservation(reservation_id):
+    """Get a specific reservation"""
+    member_id = int(get_jwt_identity())
+    reservation = Reservation.query.get(reservation_id)
     
-#     if not reservation:
-#         return {'error': 'Reservation not found'}, 404
+    if not reservation:
+        return {'error': 'Reservation not found'}, 404
     
-#     member = Member.query.get(member_id)
-#     if reservation.member_id != member_id and member.role != 'staff':
-#         return {'error': 'Unauthorized'}, 403
+    member = Member.query.get(member_id)
+    if reservation.member_id != member_id and member.role != 'staff':
+        return {'error': 'Unauthorized'}, 403
     
-#     return reservation.to_dict(rules=('-member.reservations', '-fees.reservation', '-member_notes.reservation')), 200
+    return reservation.to_dict(rules=('-member.reservations', '-fees.reservation', '-member_notes.reservation')), 200
 
+# --- DELETE --- #
 @reservations_bp.route('/<int:reservation_id>', methods=['DELETE'])
 @jwt_required()
 def delete_reservation(reservation_id):
@@ -120,6 +124,7 @@ def delete_reservation(reservation_id):
     
     return {'message': 'Reservation deleted'}, 200
 
+# --- PATCH --- #
 @reservations_bp.route('/<int:reservation_id>', methods=['PATCH'])
 @jwt_required()
 def update_reservation(reservation_id):
@@ -167,7 +172,7 @@ def update_reservation(reservation_id):
     
     return {
         'message': 'Reservation updated', 
-        'reservation': reservation.to_dict(rules=('-member', '-fees', '-member_notes'))
+        'reservation': reservation.to_dict(rules=('-member',))  # ✅ Include fees & notes
     }, 200
 
 @reservations_bp.route('/<int:reservation_id>/status', methods=['PATCH'])
@@ -192,5 +197,5 @@ def update_reservation_status(reservation_id):
     
     return {
         'message': 'Status updated', 
-        'reservation': reservation.to_dict(rules=('-member', '-fees', '-member_notes'))
+        'reservation': reservation.to_dict(rules=('-member',))  # ✅ Include fees & notes
     }, 200

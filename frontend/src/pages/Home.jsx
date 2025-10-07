@@ -5,7 +5,7 @@ import ReservationContext from '../contexts/ReservationContext'
 import ReservationList from '../components/ReservationList'
 
 function Home() {
-  const { user, logout } = useContext(AuthContext)
+  const { user, logout, loading } = useContext(AuthContext)
   const { reservations } = useContext(ReservationContext)
   
   
@@ -37,7 +37,9 @@ function Home() {
         </button>
         
         <h2>{showOnlyMine ? 'Your Reservations' : 'All Reservations'}</h2>
-        <p>Showing {displayedReservations.length} reservations</p>  {/* ✅ Show count */}
+        <p style={{ minHeight: '24px' }}>
+  {!loading && `Showing ${displayedReservations.length} reservations`}
+</p>
         
         {displayedReservations.length === 0 ? (
           <p>No reservations found.</p>
