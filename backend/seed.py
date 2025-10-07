@@ -1,140 +1,221 @@
-# backend/seed.py
-from faker import Faker
-import random
 from datetime import datetime, timedelta
 from app import create_app
 from app.extensions import db
 from app.models import Member, Reservation, Rule, ReservationFee, MemberNote
 
-fake = Faker()
-
-# CONFIGURATION
-NUMBER_OF_MEMBERS = 20
-MIN_RESERVATIONS_PER_MEMBER = 1
-MAX_RESERVATIONS_PER_MEMBER = 5
-
-RESERVATION_STATUSES = ['pending', 'confirmed', 'completed', 'cancelled']
-
 def seed_database():
     app = create_app()
     
     with app.app_context():
-        print("Deleting old data...")
+        print("🗑️  Deleting old data...")
         MemberNote.query.delete()
         ReservationFee.query.delete()
         Reservation.query.delete()
         Rule.query.delete()
         Member.query.delete()
         
-        print(f"Creating {NUMBER_OF_MEMBERS} members...")
-        members = []
-        for i in range(NUMBER_OF_MEMBERS):
-            member = Member(
-                username=fake.unique.user_name(),
-                email=fake.unique.email(),
-                full_name=fake.name(),
-                phone=fake.phone_number(),
-                role='member' if i < NUMBER_OF_MEMBERS - 2 else 'staff'  # Last 2 are staff
-            )
-            member.set_password('password123')
-            members.append(member)
+        # ✅ SIMPLE TEST USERS - No Faker BS
+        print("👥 Creating test users...")
         
-        db.session.add_all(members)
+        josh = Member(
+            username='josh',
+            email='josh@test.com',
+            full_name='Josh Dicker',
+            phone='555-1001',
+            role='member'
+        )
+        josh.set_password('pass')
+        
+        sarah = Member(
+            username='sarah',
+            email='sarah@test.com',
+            full_name='Sarah Chen',
+            phone='555-1002',
+            role='member'
+        )
+        sarah.set_password('pass')
+        
+        mike = Member(
+            username='mike',
+            email='mike@test.com',
+            full_name='Mike Rodriguez',
+            phone='555-1003',
+            role='member'
+        )
+        mike.set_password('pass')
+        
+        admin = Member(
+            username='admin',
+            email='admin@test.com',
+            full_name='Admin Staff',
+            phone='555-9999',
+            role='staff'
+        )
+        admin.set_password('pass')
+        
+        db.session.add_all([josh, sarah, mike, admin])
         db.session.commit()
         
-        print("Creating rules...")
-        rules = [
-            Rule(
-                rule_name='Large Party Fee',
-                description='Fee for parties over 10 people',
-                fee_amount=50.00,
-                condition_type='party_size_limit',
-                threshold_value=10,
-                is_active=True
-            ),
-            Rule(
-                rule_name='After Hours Fee',
-                description='Fee for reservations after 9 PM',
-                fee_amount=25.00,
-                condition_type='after_hours',
-                threshold_value=21,  # 9 PM in 24-hour
-                is_active=True
-            )
-        ]
-        db.session.add_all(rules)
+        print("📋 Creating rules...")
+        large_party = Rule(
+            rule_name='Large Party Fee',
+            description='Fee for parties over 10 people',
+            fee_amount=50.00,
+            condition_type='party_size_limit',
+            threshold_value=10,
+            is_active=True
+        )
+        
+        after_hours = Rule(
+            rule_name='After Hours Fee',
+            description='Fee for reservations after 9 PM',
+            fee_amount=25.00,
+            condition_type='after_hours',
+            threshold_value=21,
+            is_active=True
+        )
+        
+        db.session.add_all([large_party, after_hours])
         db.session.commit()
         
-        print("Creating reservations...")
-        reservations = []
-        for member in members:
-            num_reservations = random.randint(MIN_RESERVATIONS_PER_MEMBER, MAX_RESERVATIONS_PER_MEMBER)
-            for _ in range(num_reservations):
-                # Random date within next 60 days
-                days_ahead = random.randint(1, 60)
-                res_date = datetime.now().date() + timedelta(days=days_ahead)
-                
-                # Random time between 11 AM and 10 PM
-                hour = random.randint(11, 22)
-                res_time = datetime.strptime(f"{hour}:00", "%H:%M").time()
-                
-                party_size = random.randint(2, 15)
-                
-                reservation = Reservation(
-                    member_id=member.id,
-                    reservation_date=res_date,
-                    reservation_time=res_time,
-                    party_size=party_size,
-                    notes=fake.sentence() if random.random() > 0.5 else None,
-                    status=random.choice(RESERVATION_STATUSES)
-                )
-                reservations.append(reservation)
+        # ✅ SIMPLE RESERVATIONS - Easy to understand
+        print("🍽️  Creating reservations...")
         
-        db.session.add_all(reservations)
+        today = datetime.now().date()
+        
+        # Josh's reservations
+        josh_res1 = Reservation(
+            member_id=josh.id,
+            reservation_date=today + timedelta(days=1),
+            reservation_time=datetime.strptime("18:00", "%H:%M").time(),
+            party_size=4,
+            notes='Birthday dinner',
+            status='confirmed'
+        )
+        
+        josh_res2 = Reservation(
+            member_id=josh.id,
+            reservation_date=today + timedelta(days=7),
+            reservation_time=datetime.strptime("19:30", "%H:%M").time(),
+            party_size=2,
+            notes='Date night',
+            status='pending'
+        )
+        
+        josh_res3 = Reservation(
+            member_id=josh.id,
+            reservation_date=today + timedelta(days=14),
+            reservation_time=datetime.strptime("21:00", "%H:%M").time(),
+            party_size=12,
+            notes='Company party',
+            status='pending'
+        )
+        
+        # Sarah's reservations
+        sarah_res1 = Reservation(
+            member_id=sarah.id,
+            reservation_date=today + timedelta(days=2),
+            reservation_time=datetime.strptime("12:00", "%H:%M").time(),
+            party_size=3,
+            notes='Lunch meeting',
+            status='confirmed'
+        )
+        
+        sarah_res2 = Reservation(
+            member_id=sarah.id,
+            reservation_date=today + timedelta(days=10),
+            reservation_time=datetime.strptime("20:00", "%H:%M").time(),
+            party_size=6,
+            notes='Family dinner',
+            status='pending'
+        )
+        
+        # Mike's reservations
+        mike_res1 = Reservation(
+            member_id=mike.id,
+            reservation_date=today + timedelta(days=3),
+            reservation_time=datetime.strptime("17:00", "%H:%M").time(),
+            party_size=8,
+            notes='Team celebration',
+            status='confirmed'
+        )
+        
+        mike_res2 = Reservation(
+            member_id=mike.id,
+            reservation_date=today + timedelta(days=5),
+            reservation_time=datetime.strptime("22:00", "%H:%M").time(),
+            party_size=15,
+            notes='Late night party',
+            status='pending'
+        )
+        
+        all_reservations = [josh_res1, josh_res2, josh_res3, sarah_res1, sarah_res2, mike_res1, mike_res2]
+        db.session.add_all(all_reservations)
         db.session.flush()
         
-        print("Applying fees...")
+        # Apply fees
+        print("💰 Applying fees...")
         fees = []
-        for reservation in reservations:
-            # Apply large party fee
-            if reservation.party_size > 10:
-                fee = ReservationFee(
-                    reservation_id=reservation.id,
-                    rule_id=rules[0].id,
-                    fee_applied=50.00
-                )
-                fees.append(fee)
-            
-            # Apply after hours fee
-            if reservation.reservation_time.hour >= 21:
-                fee = ReservationFee(
-                    reservation_id=reservation.id,
-                    rule_id=rules[1].id,
-                    fee_applied=25.00
-                )
-                fees.append(fee)
+        
+        # Josh's large party gets fee
+        fees.append(ReservationFee(
+            reservation_id=josh_res3.id,
+            rule_id=large_party.id,
+            fee_applied=50.00
+        ))
+        
+        # Josh's late reservation gets fee
+        fees.append(ReservationFee(
+            reservation_id=josh_res3.id,
+            rule_id=after_hours.id,
+            fee_applied=25.00
+        ))
+        
+        # Mike's large party gets fee
+        fees.append(ReservationFee(
+            reservation_id=mike_res2.id,
+            rule_id=large_party.id,
+            fee_applied=50.00
+        ))
+        
+        # Mike's late reservation gets fee
+        fees.append(ReservationFee(
+            reservation_id=mike_res2.id,
+            rule_id=after_hours.id,
+            fee_applied=25.00
+        ))
         
         db.session.add_all(fees)
         
-        print("Creating member notes...")
+        # Create notes
+        print("📝 Creating notes...")
         notes = []
-        for reservation in reservations:
-            if reservation.notes:
+        for res in all_reservations:
+            if res.notes:
                 note = MemberNote(
-                    member_id=reservation.member_id,
-                    reservation_id=reservation.id,
-                    note_text=reservation.notes
+                    member_id=res.member_id,
+                    reservation_id=res.id,
+                    note_text=res.notes
                 )
                 notes.append(note)
         
         db.session.add_all(notes)
         db.session.commit()
         
-        print(f"Seeding complete!")
-        print(f"- {len(members)} members created")
-        print(f"- {len(reservations)} reservations created")
-        print(f"- {len(fees)} fees applied")
-        print(f"- {len(notes)} notes created")
-        print(f"\nTest login: username='any_username_from_above', password='password123'")
+        print(f"\n✅ Seeding complete!")
+        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print(f"👥 4 members created")
+        print(f"🍽️  7 reservations created")
+        print(f"💰 4 fees applied")
+        print(f"📝 7 notes created")
+        
+        print(f"\n🔐 LOGIN CREDENTIALS (all use password: 'pass'):")
+        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        print(f"josh   - Regular member (3 reservations)")
+        print(f"sarah  - Regular member (2 reservations)")
+        print(f"mike   - Regular member (2 reservations)")
+        print(f"admin  - Staff (sees all reservations)")
+        print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
 if __name__ == '__main__':
     seed_database()

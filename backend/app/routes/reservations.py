@@ -6,6 +6,14 @@ from datetime import datetime
 
 reservations_bp = Blueprint('reservations', __name__)
 
+@reservations_bp.route('', methods=['GET'])
+@jwt_required()
+def get_all_reservations():
+    reservations = Reservation.query.all()  # Everyone gets all
+    return {
+        'reservations': [r.to_dict() for r in reservations]
+    }, 200
+
 @reservations_bp.route('', methods=['POST'])
 @jwt_required()
 def create_reservation():
@@ -84,21 +92,21 @@ def get_reservations():
         'reservations': [r.to_dict(rules=('-member', '-fees', '-member_notes')) for r in reservations]
     }, 200
 
-@reservations_bp.route('/<int:reservation_id>', methods=['GET'])
-@jwt_required()
-def get_reservation(reservation_id):
-    """Get a specific reservation"""
-    member_id = int(get_jwt_identity())
-    reservation = Reservation.query.get(reservation_id)
+# @reservations_bp.route('/<int:reservation_id>', methods=['GET'])
+# @jwt_required()
+# def get_reservation(reservation_id):
+#     """Get a specific reservation"""
+#     member_id = int(get_jwt_identity())
+#     reservation = Reservation.query.get(reservation_id)
     
-    if not reservation:
-        return {'error': 'Reservation not found'}, 404
+#     if not reservation:
+#         return {'error': 'Reservation not found'}, 404
     
-    member = Member.query.get(member_id)
-    if reservation.member_id != member_id and member.role != 'staff':
-        return {'error': 'Unauthorized'}, 403
+#     member = Member.query.get(member_id)
+#     if reservation.member_id != member_id and member.role != 'staff':
+#         return {'error': 'Unauthorized'}, 403
     
-    return reservation.to_dict(rules=('-member.reservations', '-fees.reservation', '-member_notes.reservation')), 200
+#     return reservation.to_dict(rules=('-member.reservations', '-fees.reservation', '-member_notes.reservation')), 200
 
 @reservations_bp.route('/<int:reservation_id>', methods=['DELETE'])
 @jwt_required()
