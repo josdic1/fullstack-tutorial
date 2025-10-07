@@ -22,8 +22,8 @@ function ReservationCard({reservation, onSelect, onUpdate,onDelete}) {
     }
 
 return (
-<>
-<tr id={reservation.id}>
+
+<tr>
     <td>{reservation.member_id}</td>
     <td>{reservation.reservation_date}</td>
     <td>{reservation.reservation_time}</td>
@@ -38,7 +38,7 @@ return (
         <button id={reservation.id} name='delete' onClick={onClick}>Delete</button>
     </td>
 </tr>
-</>
+
 )}
 
 export default ReservationCard

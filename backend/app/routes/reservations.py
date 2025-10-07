@@ -120,6 +120,53 @@ def delete_reservation(reservation_id):
     
     return {'message': 'Reservation deleted'}, 200
 
+@reservations_bp.route('/<int:reservation_id>', methods=['PATCH'])
+@jwt_required()
+def update_reservation(reservation_id):
+    """Update reservation details"""
+    member_id = int(get_jwt_identity())
+    member = Member.query.get(member_id)
+    data = request.get_json()
+    
+    reservation = Reservation.query.get(reservation_id)
+    
+    if not reservation:
+        return {'error': 'Reservation not found'}, 404
+    
+    if reservation.member_id != member_id and member.role != 'staff':
+        return {'error': 'Unauthorized'}, 403
+    
+    if 'reservation_date' in data:
+        try:
+            reservation.reservation_date = datetime.strptime(data['reservation_date'], '%Y-%m-%d').date()
+        except ValueError:
+            return {'error': 'Invalid date format'}, 400
+    
+    if 'reservation_time' in data:
+        try:
+            reservation.reservation_time = datetime.strptime(data['reservation_time'], '%H:%M').time()
+        except ValueError:
+            return {'error': 'Invalid time format'}, 400
+    
+    if 'party_size' in data:
+        reservation.party_size = data['party_size']
+    
+    if 'notes' in data:
+        reservation.notes = data['notes']
+        note = MemberNote(
+            member_id=member_id,
+            reservation_id=reservation.id,
+            note_text=data['notes']
+        )
+        db.session.add(note)
+    
+    db.session.commit()
+    
+    return {
+        'message': 'Reservation updated', 
+        'reservation': reservation.to_dict(rules=('-member', '-fees', '-member_notes'))
+    }, 200
+
 @reservations_bp.route('/<int:reservation_id>/status', methods=['PATCH'])
 @jwt_required()
 def update_reservation_status(reservation_id):

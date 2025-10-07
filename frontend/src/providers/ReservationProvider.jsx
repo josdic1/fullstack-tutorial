@@ -1,42 +1,39 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useCallback } from "react"  // ✅ One import only
 import AuthContext from "../contexts/AuthContext"
 import ReservationContext from "../contexts/ReservationContext"
 
 function ReservationProvider({children}) {
-    const { token, user } = useContext(AuthContext)
+    const { token } = useContext(AuthContext)
     const [reservations, setReservations] = useState([])
 
-console.log(reservations)
-
-useEffect(() => {
-    if (token) {  // ✅ Only fetch if token exists
-        fetchReservations()
-    }
-}, [token])
-
-    const fetchReservations = async () => {
-    try {
-        const response = await fetch('http://localhost:5555/api/reservations', {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        })
+    const fetchReservations = useCallback(async () => {
+        if (!token) return
         
-        if (response.ok) {  // ✅ Must check this
-            const data = await response.json()
-            setReservations(data.reservations)
-        } else {
-            console.error('Failed to fetch reservations')
-            // Don't set reservations if request failed
+        try {
+            const response = await fetch('http://localhost:5555/api/reservations', {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            
+            if (response.ok) {
+                const data = await response.json()
+                setReservations(data.reservations)
+            } else {
+                console.error('Failed to fetch reservations')
+            }
+        } catch (error) {
+            console.error('Error fetching reservations:', error)
         }
-    } catch (error) {
-        console.error('Error fetching reservations:', error)
-        // Don't set reservations if request failed
-    }
-}
+    }, [token])
+
+    useEffect(() => {
+        fetchReservations()
+    }, [fetchReservations])
+
 
     const createReservation = async (reservationData) => {
-    console.log('Sending:', reservationData)  // Move log to top
+    console.log('Sending:', reservationData)
     
     try {
         const response = await fetch('http://localhost:5555/api/reservations', {
@@ -49,14 +46,14 @@ useEffect(() => {
         })
         
         if (response.ok) {
-            const newReservation = await response.json()
-            setReservations(prev => [...prev, newReservation])
-            return true  // ✅ SUCCESS
+            const { reservation } = await response.json()  // ✅ Destructure
+            setReservations(prev => [...prev, reservation])  // ✅ Use reservation
+            return true
         }
-        return false  // ✅ FAILED
+        return false
     } catch (error) {
         console.error('Error creating reservation:', error)
-        return false  // ✅ ERROR
+        return false
     }
 }
 
@@ -72,8 +69,10 @@ const updateReservation = async (updatedData) => {
         })
         
         if (response.ok) {
-            const updatedReservation = await response.json()
-            setReservations(prev => prev.map(r => r.id === updatedData.id ? updatedReservation : r))
+            const { reservation } = await response.json()  // ✅ Destructure
+            setReservations(prev => prev.map(r => 
+                r.id === updatedData.id ? reservation : r
+            ))
             return true
         }
         return false
@@ -83,35 +82,32 @@ const updateReservation = async (updatedData) => {
     }
 }
 
-const deleteReservation = async (id) => {
-    try {
-        const response = await fetch(`http://localhost:5555/api/reservations/${id}`, {
-            method: 'DELETE',
-            headers: {
-                "Authorization": `Bearer ${token}`
+    const deleteReservation = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:5555/api/reservations/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+            
+            if (response.ok) {
+                setReservations(prev => prev.filter(r => r.id !== id))
+                return true
             }
-        })
-        
-        if (response.ok) {  // ✅ Check if deletion was successful
-            setReservations(prev => prev.filter(r => r.id !== id))
-            return true  // ✅ SUCCESS
+            return false
+        } catch (error) {
+            console.error('Error deleting reservation:', error)
+            return false
         }
-        return false  // ✅ FAILED
-    } catch (error) {
-        console.error('Error deleting reservation:', error)
-        return false  // ✅ ERROR
     }
-}
 
-    
-
-return (
-<>
-    <ReservationContext.Provider 
-        value={{ reservations, fetchReservations, createReservation, updateReservation, deleteReservation }}>
+    return (
+        <ReservationContext.Provider 
+            value={{ reservations, fetchReservations, createReservation, updateReservation, deleteReservation }}>
             {children}
-    </ReservationContext.Provider>
-</>
-)}
+        </ReservationContext.Provider>
+    )
+}
 
 export default ReservationProvider
