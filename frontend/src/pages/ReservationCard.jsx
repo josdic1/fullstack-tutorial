@@ -1,6 +1,8 @@
 
 
-function ReservationCard({reservation, onSelect, onUpdate, onDelete}) {
+function ReservationCard({reservation, onSelect, onUpdate,onDelete}) {
+
+
 
     const onClick = (e) => {
         const { name } = e.target

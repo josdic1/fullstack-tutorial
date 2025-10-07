@@ -15,7 +15,8 @@ const routes = [
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
-      { path: "new", element: <NewReservation /> },
+      { path: "reservations/new", element: <NewReservation /> },
+      { path: "reservations/:id/edit", element: <NewReservation /> },
       { path: "reservation/:id", element: <ReservationCard /> },
       { path: "reservations", element: <ReservationList /> },
     ]

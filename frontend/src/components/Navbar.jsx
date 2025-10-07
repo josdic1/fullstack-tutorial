@@ -24,7 +24,7 @@ function Navbar() {
         {user ? (
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <span>Welcome, {user.full_name}</span>
-            <button onClick={() => navigate('new')} style={{ padding: '5px 15px' }}>
+            <button onClick={() => navigate('reservations/new')} style={{ padding: '5px 15px' }}>
               New Reservation
             </button>
             <button onClick={logout} style={{ padding: '5px 15px' }}>

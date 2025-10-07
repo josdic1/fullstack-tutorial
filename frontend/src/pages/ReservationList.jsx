@@ -20,7 +20,11 @@ function ReservationList() {
                 reservation={reservation}
                 onSelect={() => navigate(`/reservations/${reservation.id}`)}
                 onUpdate={() => navigate(`/reservations/${reservation.id}/edit`)}
-                onDelete={() => deleteReservation(reservation.id)}   
+                onDelete={() => {
+                if (confirm('Are you sure you want to delete this reservation?')) {
+        deleteReservation(reservation.id)
+    }
+}} 
             />
         ))
 
