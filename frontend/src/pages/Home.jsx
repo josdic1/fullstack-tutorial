@@ -1,26 +1,23 @@
-import { useState } from 'react'
+import { useContext } from 'react'
+import { Navigate } from 'react-router-dom'
+import AuthContext from '../contexts/AuthContext'
 
 function Home() {
-  const [token, setToken] = useState('')
+  const { user, logout } = useContext(AuthContext)
 
-  const testLogin = async () => {
-    const response = await fetch('http://localhost:5555/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: 'storres',
-        password: 'password123'
-      })
-    })
-    const data = await response.json()
-    setToken(data.access_token)
+  console.log('Home component - user:', user)  // ← Add this
+
+  if (!user) {
+    console.log('No user, redirecting to login')  // ← Add this
+    return <Navigate to="/login" />
   }
 
   return (
     <div style={{ padding: '40px' }}>
-      <h1>Home</h1>
-      <button onClick={testLogin}>Test Login</button>
-      {token && <p>Token: {token.slice(0, 30)}...</p>}
+      <h1> Home Page </h1>
+      <p>Welcome, {user.full_name}!</p>
+      <p>Email: {user.email}</p>
+      <button onClick={logout}>Logout</button>
     </div>
   )
 }

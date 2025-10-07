@@ -1,13 +1,14 @@
 import { useState, useContext } from "react";
-import { useNaviugate} from "../hooks/useNavigate";
+import { useNavigate} from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
-  const navigate = useNaviugate();
+  const navigate = useNavigate();
   const [error, setError] = useState('');
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,9 +20,11 @@ function Login() {
     } else {
       setError(result.message || 'Login failed. Please try again.');
     }
+    console.log(result)
   }
 
 return (
+  <>
     <div style={{ maxWidth: '400px', margin: '50px auto' }}>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
@@ -51,6 +54,7 @@ return (
         </button>
       </form>
     </div>
+    </>
   )
 }
 
