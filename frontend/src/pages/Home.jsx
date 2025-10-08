@@ -7,14 +7,12 @@ import ReservationList from '../components/ReservationList'
 function Home() {
   const { user, logout } = useContext(AuthContext)
   const { reservations, loading } = useContext(ReservationContext)
-  const [showOnlyMine, setShowOnlyMine] = useState(true)
+
 
   if (!user) {
     return <Navigate to="/login" />
   }
 
-  const userReservations = reservations.filter(r => r.member_id === user.id)
-  const displayedReservations = showOnlyMine ? userReservations : reservations
 
   return (
     <>
@@ -25,22 +23,18 @@ function Home() {
         <button onClick={logout}>Logout</button>
       </div>
       <div style={{ padding: '40px' }}>
-        {user.role === 'staff' && (
-          <button onClick={() => setShowOnlyMine(!showOnlyMine)}>
-            {showOnlyMine ? 'Show All Reservations' : 'Show My Reservations'}
-          </button>
-        )}
+      
         
-        <h2>{showOnlyMine ? 'Your Reservations' : 'All Reservations'}</h2>
+        <h2>All Reservations</h2>
         
         {loading ? (
           <p>Loading reservations...</p>
-        ) : displayedReservations.length === 0 ? (
+        ) : reservations.length === 0 ? (
           <p>No reservations found.</p>
         ) : (
           <>
-            <p>Showing {displayedReservations.length} reservations</p>
-            <ReservationList reservations={displayedReservations} />
+            <p>Showing {reservations.length} reservations</p>
+            <ReservationList reservations={reservations} />
           </>
         )}
       </div>
