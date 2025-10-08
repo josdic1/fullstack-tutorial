@@ -1,49 +1,40 @@
-import { useState, useEffect, useContext, useCallback } from "react"
+import { useState, useEffect, useContext } from "react"
 import AuthContext from "../contexts/AuthContext"
 import ReservationContext from "../contexts/ReservationContext"
 
 function ReservationProvider({children}) {
-    const { token, user } = useContext(AuthContext)  // ✅ Get user too
+    const { token, user } = useContext(AuthContext)  // ✅ Only declare once
     const [reservations, setReservations] = useState([])
-    const [error, setError] = useState(null)  // ✅ Track errors
+    const [error, setError] = useState(null)
 
-    const fetchReservations = useCallback(async () => {
-        if (!token || !user) {  // ✅ Wait for BOTH token and user
+    const fetchReservations = async () => {
+        if (!token || !user) {
             console.log('Skipping fetch - no token or user yet')
             return
         }
         
-        console.log('Fetching reservations for user:', user.username, 'role:', user.role)  // ✅ Debug log
-        
         try {
             const response = await fetch('http://localhost:5555/api/reservations', {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                headers: { "Authorization": `Bearer ${token}` }
             })
             
             if (response.ok) {
                 const data = await response.json()
-                console.log('Fetched reservations:', data.reservations.length)  // ✅ Debug log
                 setReservations(data.reservations)
                 setError(null)
-            } else {
-                const errorData = await response.json()
-                console.error('Failed to fetch reservations:', response.status, errorData)
-                setError(errorData.error || 'Failed to fetch reservations')  // ✅ Store error
             }
         } catch (error) {
-            console.error('Error fetching reservations:', error)
-            setError('Cannot connect to server')  // ✅ Store error
+            console.error('Error:', error)
+            setError('Cannot connect to server')
         }
-    }, [token, user])  // ✅ Depend on both token and user
+    }
 
     useEffect(() => {
         fetchReservations()
-    }, [fetchReservations])
+    }, [token, user])
 
     const createReservation = async (reservationData) => {
-        console.log('Sending:', reservationData)
+  
         
         try {
             const response = await fetch('http://localhost:5555/api/reservations', {

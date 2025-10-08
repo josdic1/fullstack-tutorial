@@ -27,10 +27,11 @@ def create_app(config_name='development'):
     # Register blueprints
     from app.routes.auth import auth_bp
     from app.routes.reservations import reservations_bp
-
+    from app.routes.rules import rules_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(reservations_bp, url_prefix='/api/reservations')
+    app.register_blueprint(rules_bp, url_prefix='/api/rules')
 
 
     @app.route('/api/health')
