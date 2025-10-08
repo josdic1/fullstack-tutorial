@@ -34,7 +34,7 @@ useEffect(() => {
 
 const onFormChange = (e) => {
     const { name, value } = e.target
-    console.log('🔄 Field changed:', name, '=', value)  // ✅ Debug
+    // console.log('🔄 Field changed:', name, '=', value)  // ✅ Debug
     setFormData(prev => ({
         ...prev,
         [name]: name === 'party_size' ? parseInt(value) || 1 : value

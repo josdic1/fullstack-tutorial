@@ -77,27 +77,35 @@ def get_reservations():
     member_id = int(get_jwt_identity())
     member = Member.query.get(member_id)
     
+    # ✅ ADD THIS CHECK
+    if not member:
+        return {'error': 'Member not found'}, 404
+    
     if member.role == 'staff':
         reservations = Reservation.query.order_by(Reservation.reservation_date.desc()).all()
     else:
         reservations = Reservation.query.filter_by(member_id=member_id).order_by(Reservation.reservation_date.desc()).all()
     
     return {
-        'reservations': [r.to_dict(rules=('-member',)) for r in reservations]  # ✅ Include fees & notes
+        'reservations': [r.to_dict(rules=('-member',)) for r in reservations]
     }, 200
 
 # --- GET --- #
 @reservations_bp.route('/<int:reservation_id>', methods=['GET'])
 @jwt_required()
 def get_reservation(reservation_id):
-    """Get a specific reservation"""
     member_id = int(get_jwt_identity())
+    member = Member.query.get(member_id)
+    
+    # ✅ Check member exists first
+    if not member:
+        return {'error': 'Member not found'}, 404
+    
     reservation = Reservation.query.get(reservation_id)
     
     if not reservation:
         return {'error': 'Reservation not found'}, 404
     
-    member = Member.query.get(member_id)
     if reservation.member_id != member_id and member.role != 'staff':
         return {'error': 'Unauthorized'}, 403
     
@@ -168,11 +176,35 @@ def update_reservation(reservation_id):
     if 'status' in data:
         reservation.status = data['status']
     
+    # ✅ ADD THIS: Recalculate fees if party_size or time changed
+    if 'party_size' in data or 'reservation_time' in data:
+        # Remove old fees
+        ReservationFee.query.filter_by(reservation_id=reservation.id).delete()
+        
+        # Reapply rules
+        active_rules = Rule.query.filter_by(is_active=True).all()
+        for rule in active_rules:
+            fee_applies = False
+            
+            if rule.condition_type == 'party_size_limit' and reservation.party_size > rule.threshold_value:
+                fee_applies = True
+            
+            if rule.condition_type == 'after_hours' and reservation.reservation_time.hour >= rule.threshold_value:
+                fee_applies = True
+            
+            if fee_applies:
+                fee = ReservationFee(
+                    reservation_id=reservation.id,
+                    rule_id=rule.id,
+                    fee_applied=rule.fee_amount
+                )
+                db.session.add(fee)
+    
     db.session.commit()
     
     return {
         'message': 'Reservation updated', 
-        'reservation': reservation.to_dict(rules=('-member',))  # ✅ Include fees & notes
+        'reservation': reservation.to_dict(rules=('-member',))
     }, 200
 
 @reservations_bp.route('/<int:reservation_id>/status', methods=['PATCH'])

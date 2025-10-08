@@ -13,10 +13,8 @@ class Rule(db.Model, SerializerMixin):
     threshold_value = db.Column(db.Integer)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))  # ✅ This line
     
     reservation_fees = db.relationship('ReservationFee', back_populates='rule')
     
     serialize_rules = ('-reservation_fees.rule',)
-    
-    def __repr__(self):
-        return f'<Rule {self.rule_name}>'

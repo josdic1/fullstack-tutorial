@@ -23,16 +23,23 @@ function Login() {
     console.log(result)
   }
 
-  const setLogin = () => {
+  const setUserLogin = () => {
     setUsername('josh');
     setPassword('pass');
   }
+
+    const setAdminLogin = () => {
+    setUsername('admin');
+    setPassword('pass');
+  }
+
 
 
 return (
   <>
     <div style={{ maxWidth: '400px', margin: '50px auto' }}>
-      <button type='button' onClick={setLogin}>Test Login</button>
+      <button type='button' onClick={setUserLogin}>User Login</button>
+            <button type='button' onClick={setAdminLogin}>Admin Login</button>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>

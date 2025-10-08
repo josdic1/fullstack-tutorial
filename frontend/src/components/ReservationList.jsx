@@ -1,21 +1,21 @@
 import { useContext } from "react"
-import { useNavigate, useOutletContext } from "react-router-dom"  // ✅ Add useOutletContext
+import { useNavigate, useOutletContext } from "react-router-dom"
 import ReservationContext from "../contexts/ReservationContext"
-import ReservationCard from '../components/ReservationCard'
+import ReservationCard from "../components/ReservationCard"
 
 function ReservationList({ reservations = [] }) {
     const { deleteReservation } = useContext(ReservationContext)
-    const { showToast } = useOutletContext()  // ✅ Get toast function
+    const { showToast } = useOutletContext()
     const navigate = useNavigate()
 
-    const handleDelete = async (id) => {  // ✅ Make it async
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this reservation?')) {
             const success = await deleteReservation(id)
             
             if (success) {
-                showToast('Reservation deleted successfully!', 'success')  // ✅ Success toast
+                showToast('Reservation deleted successfully!', 'success')
             } else {
-                showToast('Failed to delete reservation', 'error')  // ✅ Error toast
+                showToast('Failed to delete reservation', 'error')
             }
         }
     }
@@ -30,10 +30,10 @@ function ReservationList({ reservations = [] }) {
                     <th>Party</th>
                     <th>Notes</th>
                     <th>Status</th>
+                    <th>Fees</th>
                     <th>Created on</th>
                     <th>Modified on</th>
                     <th>Actions</th>
-                    <th>Res ID</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,7 +43,7 @@ function ReservationList({ reservations = [] }) {
                         reservation={reservation}
                         onSelect={() => navigate(`/reservations/${reservation.id}`)}
                         onUpdate={() => navigate(`/reservations/${reservation.id}/edit`)}
-                        onDelete={() => handleDelete(reservation.id)}  // ✅ Use handleDelete
+                        onDelete={() => handleDelete(reservation.id)}
                     />
                 ))}
             </tbody>
