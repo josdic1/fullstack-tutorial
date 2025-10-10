@@ -7,6 +7,8 @@ function ReservationProvider({children}) {
     const [reservations, setReservations] = useState([])
     const [error, setError] = useState(null)
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5555/api';
+
     const fetchReservations = async () => {
         if (!token || !user) {
             console.log('Skipping fetch - no token or user yet')
@@ -14,7 +16,7 @@ function ReservationProvider({children}) {
         }
         
         try {
-            const response = await fetch('http://localhost:5555/api/reservations', {
+            const response = await fetch(`${API_URL}/reservations`, {
                 headers: { "Authorization": `Bearer ${token}` }
             })
             
@@ -37,7 +39,7 @@ function ReservationProvider({children}) {
   
         
         try {
-            const response = await fetch('http://localhost:5555/api/reservations', {
+            const response = await fetch(`${API_URL}/reservations`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -60,7 +62,7 @@ function ReservationProvider({children}) {
 
     const updateReservation = async (updatedData) => {
         try {
-            const response = await fetch(`http://localhost:5555/api/reservations/${updatedData.id}`, {
+            const response = await fetch(`${API_URL}/reservations/${updatedData.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +88,7 @@ function ReservationProvider({children}) {
 
     const deleteReservation = async (id) => {
         try {
-            const response = await fetch(`http://localhost:5555/api/reservations/${id}`, {
+            const response = await fetch(`${API_URL}/reservations/${id}`, {
                 method: 'DELETE',
                 headers: {
                     "Authorization": `Bearer ${token}`

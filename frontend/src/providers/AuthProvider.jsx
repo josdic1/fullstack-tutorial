@@ -6,6 +6,9 @@ function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token') || null)
   const [loading, setLoading] = useState(true)  // Add loading state
 
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5555/api';
+
   // Load user on app startup if token exists
   useEffect(() => {
     const loadUser = async () => {
@@ -13,7 +16,7 @@ function AuthProvider({ children }) {
       
       if (storedToken) {
         try {
-          const response = await fetch('http://localhost:5555/api/auth/me', {
+          const response = await fetch(`${API_URL}/auth/me`, {
             headers: {
               'Authorization': `Bearer ${storedToken}`
             }
@@ -43,7 +46,7 @@ function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch('http://localhost:5555/api/auth/login', {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
