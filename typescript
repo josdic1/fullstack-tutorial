@@ -1,1 +1,19 @@
 Script started on Fri Oct 10 16:25:15 2025
+[1m[7m%[27m[1m[0m                                                                                                                                     [0m[27m[24m[Jjoshdicker@Mac fullstack-tutorial % [K[?2004hggit add .[?2004l
+[1m[7m%[27m[1m[0m                                                                                                                                     [0m[27m[24m[Jjoshdicker@Mac fullstack-tutorial % [K[?2004hggit commit -m ""f"i"x"e"d" "m"e"m"b"e"r"."r"o"l"e" "P"A"T"C"H" "i"n" "r"e"s"e"r"v"a"t"i"o"n" "t"r"o"u"t"e"s"[?2004l
+[main 04ce524] fixed member.role PATCH in reservation troutes
+ 3 files changed, 13 insertions(+), 9 deletions(-)
+ create mode 100755 populate_data.sh
+ create mode 100644 typescript
+[1m[7m%[27m[1m[0m                                                                                                                                     [0m[27m[24m[Jjoshdicker@Mac fullstack-tutorial % [K[?2004hggit push[?2004l
+Enter passphrase for key '/Users/joshdicker/.ssh/id_ed25519': 
+Enumerating objects: 12, done.
+Counting objects:   8% (1/12)Counting objects:  16% (2/12)Counting objects:  25% (3/12)Counting objects:  33% (4/12)Counting objects:  41% (5/12)Counting objects:  50% (6/12)Counting objects:  58% (7/12)Counting objects:  66% (8/12)Counting objects:  75% (9/12)Counting objects:  83% (10/12)Counting objects:  91% (11/12)Counting objects: 100% (12/12)Counting objects: 100% (12/12), done.
+Delta compression using up to 10 threads
+Compressing objects:  16% (1/6)Compressing objects:  33% (2/6)Compressing objects:  50% (3/6)Compressing objects:  66% (4/6)Compressing objects:  83% (5/6)Compressing objects: 100% (6/6)Compressing objects: 100% (6/6), done.
+Writing objects:  14% (1/7)Writing objects:  28% (2/7)Writing objects:  42% (3/7)Writing objects:  57% (4/7)Writing objects:  71% (5/7)Writing objects:  85% (6/7)Writing objects: 100% (7/7)Writing objects: 100% (7/7), 691 bytes | 691.00 KiB/s, done.
+Total 7 (delta 5), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas:   0% (0/5)[Kremote: Resolving deltas:  20% (1/5)[Kremote: Resolving deltas:  40% (2/5)[Kremote: Resolving deltas:  60% (3/5)[Kremote: Resolving deltas:  80% (4/5)[Kremote: Resolving deltas: 100% (5/5)[Kremote: Resolving deltas: 100% (5/5), completed with 5 local objects.[K
+To github.com:josdic1/fullstack-tutorial.git
+   1ebfd4b..04ce524  main -> main
+[1m[7m%[27m[1m[0m                                                                                                                                     [0m[27m[24m[Jjoshdicker@Mac fullstack-tutorial % [K[?2004h

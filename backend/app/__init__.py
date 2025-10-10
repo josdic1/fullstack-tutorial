@@ -19,12 +19,17 @@ def create_app(config_name='development'):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     jwt.init_app(app)
-    cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
+    
+    # FIX CORS - add supports_credentials and allow all methods
+    cors.init_app(app, 
+                  resources={r"/api/*": {"origins": "*"}},
+                  supports_credentials=True,
+                  allow_headers=["Content-Type", "Authorization"],
+                  methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
 
     # Import all models
     from app.models import Member, Reservation, Rule, ReservationFee, MemberNote
 
-    # ADD THESE JWT ERROR HANDLERS
     from flask_jwt_extended.exceptions import NoAuthorizationError
     
     @jwt.unauthorized_loader
@@ -35,7 +40,7 @@ def create_app(config_name='development'):
     @jwt.invalid_token_loader
     def invalid_token_callback(error):
         print(f"JWT INVALID TOKEN: {error}")
-        return {'error': 'Invalid token'}, 422  # <-- THIS IS YOUR 422!
+        return {'error': 'Invalid token'}, 422
 
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_data):
