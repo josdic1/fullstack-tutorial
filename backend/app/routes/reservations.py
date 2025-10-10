@@ -37,20 +37,22 @@ def create_reservation():
     db.session.flush()
     
     active_rules = Rule.query.filter_by(is_active=True).all()
-    
     for rule in active_rules:
-        fee_applies = False
-        
-        if rule.condition_type == 'party_size_limit' and data['party_size'] > rule.threshold_value:
-            fee_applies = True
-        
-        if fee_applies:
-            fee = ReservationFee(
-                reservation_id=reservation.id,
-                rule_id=rule.id,
-                fee_applied=rule.fee_amount
-            )
-            db.session.add(fee)
+            fee_applies = False
+    
+    if rule.condition_type == 'party_size_limit' and rule.threshold_value is not None and reservation.party_size > rule.threshold_value:
+        fee_applies = True
+    
+    if rule.condition_type == 'after_hours' and rule.threshold_value is not None and reservation.reservation_time.hour >= rule.threshold_value:
+        fee_applies = True
+    
+    if fee_applies:
+        fee = ReservationFee(
+            reservation_id=reservation.id,
+            rule_id=rule.id,
+            fee_applied=rule.fee_amount
+        )
+        db.session.add(fee)
     
     if data.get('notes'):
         note = MemberNote(
