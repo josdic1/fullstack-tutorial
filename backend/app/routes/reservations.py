@@ -62,10 +62,9 @@ def create_reservation():
     
     db.session.commit()
     
-    # Manual serialization to avoid recursion
     return {
         'message': 'Reservation created successfully',
-        'reservation': reservation.to_dict(rules=('-member',)),  # ✅ Include fees & notes
+        'reservation': reservation.to_dict(rules=('-member',)),
         'total_fees': float(reservation.calculate_total_fees())
     }, 201
 
@@ -77,7 +76,6 @@ def get_reservations():
     member_id = int(get_jwt_identity())
     member = Member.query.get(member_id)
     
-    # ✅ ADD THIS CHECK
     if not member:
         return {'error': 'Member not found'}, 404
     
@@ -97,7 +95,6 @@ def get_reservation(reservation_id):
     member_id = int(get_jwt_identity())
     member = Member.query.get(member_id)
     
-    # ✅ Check member exists first
     if not member:
         return {'error': 'Member not found'}, 404
     
@@ -118,6 +115,9 @@ def delete_reservation(reservation_id):
     """Delete a reservation"""
     member_id = int(get_jwt_identity())
     member = Member.query.get(member_id)
+    
+    if not member:
+        return {'error': 'Member not found'}, 404
     
     reservation = Reservation.query.get(reservation_id)
     
@@ -140,6 +140,9 @@ def update_reservation(reservation_id):
     member_id = int(get_jwt_identity())
     member = Member.query.get(member_id)
     data = request.get_json()
+    
+    if not member:
+        return {'error': 'Member not found'}, 404
     
     reservation = Reservation.query.get(reservation_id)
     
@@ -176,12 +179,9 @@ def update_reservation(reservation_id):
     if 'status' in data:
         reservation.status = data['status']
     
-    # ✅ ADD THIS: Recalculate fees if party_size or time changed
     if 'party_size' in data or 'reservation_time' in data:
-        # Remove old fees
         ReservationFee.query.filter_by(reservation_id=reservation.id).delete()
         
-        # Reapply rules
         active_rules = Rule.query.filter_by(is_active=True).all()
         for rule in active_rules:
             fee_applies = False
@@ -215,6 +215,9 @@ def update_reservation_status(reservation_id):
     member = Member.query.get(member_id)
     data = request.get_json()
     
+    if not member:
+        return {'error': 'Member not found'}, 404
+    
     reservation = Reservation.query.get(reservation_id)
     
     if not reservation:
@@ -229,5 +232,5 @@ def update_reservation_status(reservation_id):
     
     return {
         'message': 'Status updated', 
-        'reservation': reservation.to_dict(rules=('-member',))  # ✅ Include fees & notes
+        'reservation': reservation.to_dict(rules=('-member',))
     }, 200
