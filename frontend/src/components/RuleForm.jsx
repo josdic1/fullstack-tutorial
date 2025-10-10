@@ -1,3 +1,4 @@
+// src/components/RuleForm.jsx
 import { useState, useEffect } from 'react';
 import { useRules } from '../hooks/useRules';
 import './RuleForm.css';
@@ -9,6 +10,7 @@ const RuleForm = ({ rule, onClose }) => {
     rule_name: '',
     description: '',
     fee_amount: '',
+    fee_type: 'flat',  // ← ADD THIS
     condition_type: 'party_size',
     threshold_value: '',
     is_active: true
@@ -24,6 +26,7 @@ const RuleForm = ({ rule, onClose }) => {
         rule_name: rule.rule_name,
         description: rule.description,
         fee_amount: rule.fee_amount,
+        fee_type: rule.fee_type || 'flat',  // ← ADD THIS
         condition_type: rule.condition_type,
         threshold_value: rule.threshold_value || '',
         is_active: rule.is_active
@@ -78,6 +81,7 @@ const RuleForm = ({ rule, onClose }) => {
         rule_name: formData.rule_name,
         description: formData.description,
         fee_amount: parseFloat(formData.fee_amount),
+        fee_type: formData.fee_type,  // ← ADD THIS
         condition_type: formData.condition_type,
         threshold_value: formData.threshold_value ? parseInt(formData.threshold_value) : null,
         is_active: formData.is_active
@@ -153,6 +157,21 @@ const RuleForm = ({ rule, onClose }) => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="fee_type">Fee Type *</label>
+            <select
+              id="fee_type"
+              name="fee_type"
+              value={formData.fee_type}
+              onChange={handleChange}
+            >
+              <option value="flat">Flat Fee</option>
+              <option value="per_person">Per Person</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
             <label htmlFor="threshold_value">Threshold Value</label>
             <input
               type="number"
@@ -165,25 +184,25 @@ const RuleForm = ({ rule, onClose }) => {
             />
             <span className="help-text">Optional - used for party size, booking days, etc.</span>
           </div>
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="condition_type">Condition Type *</label>
-          <select
-            id="condition_type"
-            name="condition_type"
-            value={formData.condition_type}
-            onChange={handleChange}
-            className={errors.condition_type ? 'error' : ''}
-          >
-            <option value="party_size">Party Size</option>
-            <option value="booking_days">Booking Days in Advance</option>
-            <option value="after_hours">After Hours</option>
-            <option value="weekend">Weekend</option>
-            <option value="holiday">Holiday</option>
-            <option value="custom">Custom</option>
-          </select>
-          {errors.condition_type && <span className="error-msg">{errors.condition_type}</span>}
+          <div className="form-group">
+            <label htmlFor="condition_type">Condition Type *</label>
+            <select
+              id="condition_type"
+              name="condition_type"
+              value={formData.condition_type}
+              onChange={handleChange}
+              className={errors.condition_type ? 'error' : ''}
+            >
+              <option value="party_size">Party Size</option>
+              <option value="booking_days">Booking Days in Advance</option>
+              <option value="after_hours">After Hours</option>
+              <option value="weekend">Weekend</option>
+              <option value="holiday">Holiday</option>
+              <option value="custom">Custom</option>
+            </select>
+            {errors.condition_type && <span className="error-msg">{errors.condition_type}</span>}
+          </div>
         </div>
 
         <div className="form-group checkbox-group">

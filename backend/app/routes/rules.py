@@ -53,12 +53,14 @@ def get_rules():
             'rule_name': rule.rule_name,
             'description': rule.description,
             'fee_amount': float(rule.fee_amount),
+            'fee_type': rule.fee_type,
             'condition_type': rule.condition_type,
             'threshold_value': rule.threshold_value,
             'is_active': rule.is_active
         })
     
     return jsonify(rules_data), 200
+
 
 # GET single rule
 @rules_bp.route('/<int:rule_id>', methods=['GET'])
@@ -72,7 +74,16 @@ def get_rule(rule_id):
         return {'error': 'Member not found'}, 404
     
     rule = Rule.query.get_or_404(rule_id)
-    return jsonify(rule.to_dict()), 200
+    return jsonify({
+        'id': rule.id,
+        'rule_name': rule.rule_name,
+        'description': rule.description,
+        'fee_amount': float(rule.fee_amount),
+        'fee_type': rule.fee_type,
+        'condition_type': rule.condition_type,
+        'threshold_value': rule.threshold_value,
+        'is_active': rule.is_active
+    }), 200
 
 
 # POST create new rule
@@ -103,6 +114,7 @@ def create_rule():
             rule_name=data['rule_name'],
             description=data['description'],
             fee_amount=float(data['fee_amount']),
+            fee_type=data.get('fee_type', 'flat'),
             condition_type=data['condition_type'],
             threshold_value=data.get('threshold_value'),
             is_active=data.get('is_active', True)
@@ -110,7 +122,16 @@ def create_rule():
         db.session.add(new_rule)
         db.session.commit()
         
-        return jsonify(new_rule.to_dict()), 201
+        return jsonify({
+            'id': new_rule.id,
+            'rule_name': new_rule.rule_name,
+            'description': new_rule.description,
+            'fee_amount': float(new_rule.fee_amount),
+            'fee_type': new_rule.fee_type,
+            'condition_type': new_rule.condition_type,
+            'threshold_value': new_rule.threshold_value,
+            'is_active': new_rule.is_active
+        }), 201
     except Exception as e:
         db.session.rollback()
         return {'error': str(e)}, 500
@@ -137,6 +158,8 @@ def update_rule(rule_id):
             rule.description = data['description']
         if 'fee_amount' in data:
             rule.fee_amount = float(data['fee_amount'])
+        if 'fee_type' in data:
+            rule.fee_type = data['fee_type']
         if 'condition_type' in data:
             rule.condition_type = data['condition_type']
         if 'threshold_value' in data:
@@ -146,7 +169,16 @@ def update_rule(rule_id):
         
         db.session.commit()
         
-        return jsonify(rule.to_dict()), 200
+        return jsonify({
+            'id': rule.id,
+            'rule_name': rule.rule_name,
+            'description': rule.description,
+            'fee_amount': float(rule.fee_amount),
+            'fee_type': rule.fee_type,
+            'condition_type': rule.condition_type,
+            'threshold_value': rule.threshold_value,
+            'is_active': rule.is_active
+        }), 200
     except Exception as e:
         db.session.rollback()
         return {'error': str(e)}, 500
