@@ -27,9 +27,9 @@ function Navbar() {
             <button onClick={() => navigate('reservations/new')} style={{ padding: '5px 15px' }}>
               New Reservation
             </button>
-             <button onClick={() => navigate('rules')} style={{ padding: '5px 15px' }}>
+             {user.role === 'staff' ? <button onClick={() => navigate('rules')} style={{ padding: '5px 15px' }}>
               Rules
-            </button>
+            </button> : console.log('hiding rules nav from user')}
             <button onClick={logout} style={{ padding: '5px 15px' }}>
               Logout
             </button>

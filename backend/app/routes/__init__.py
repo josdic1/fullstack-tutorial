@@ -7,3 +7,4 @@ pass
 # Or import your blueprints for convenience:
 from app.routes.auth import auth_bp
 from app.routes.reservations import reservations_bp
+from app.routes.rules import rules_bp
