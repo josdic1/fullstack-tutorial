@@ -1,118 +1,89 @@
-import { useState, useContext } from "react";
-import { useNavigate} from "react-router-dom";
-import AuthContext from "../contexts/AuthContext";
+// src/pages/Login.jsx
+import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AuthContext from '../contexts/AuthContext';
+import './Login.css';
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginType, setLoginType] = useState("user");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+    setLoading(true);
+    
     const result = await login(username, password);
+    
     if (result.success) {
-      navigate("/");
+      navigate('/');
     } else {
-      setError(result.message || 'Login failed. Please try again.');
+      setError(result.error);
+      setLoading(false);
     }
-    console.log(result)
-  }
-
-  const setUserLogin = () => {
-    setUsername('josh');
-    setPassword('pass');
-    setLoginType('user');
-  }
-
-  const setAdminLogin = () => {
-    setUsername('admin');
-    setPassword('pass');
-    setLoginType('admin');
-  }
+  };
 
   return (
-    <>
-      <div style={{ maxWidth: '400px', margin: '50px auto' }}>
-        {/* Clean Toggle Buttons */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '0',
-          marginBottom: '24px',
-          border: '1px solid #dee2e6',
-          borderRadius: '6px',
-          overflow: 'hidden',
-          width: 'fit-content'
-        }}>
-          <button
-            type='button'
-            onClick={setUserLogin}
-            style={{
-              padding: '10px 24px',
-              backgroundColor: loginType === 'user' ? '#007bff' : 'white',
-              color: loginType === 'user' ? 'white' : '#495057',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.2s',
-              borderRight: '1px solid #dee2e6'
-            }}
-          >
-            User Login
-          </button>
-          <button
-            type='button'
-            onClick={setAdminLogin}
-            style={{
-              padding: '10px 24px',
-              backgroundColor: loginType === 'admin' ? '#007bff' : 'white',
-              color: loginType === 'admin' ? 'white' : '#495057',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '500',
-              transition: 'all 0.2s'
-            }}
-          >
-            Admin Login
-          </button>
-        </div>
-
-        <h2>Login</h2>
+    <div className="login-container">
+      <div className="login-card">
+        <h1>Login to Catering App</h1>
+        
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '15px' }}>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
             <input
               type="text"
-              placeholder="Username"
+              id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              style={{ width: '100%', padding: '8px' }}
+              placeholder="Enter username"
+              disabled={loading}
               required
             />
           </div>
-          <div style={{ marginBottom: '15px' }}>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
             <input
               type="password"
-              placeholder="Password"
+              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              style={{ width: '100%', padding: '8px' }}
+              placeholder="Enter password"
+              disabled={loading}
               required
             />
           </div>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <button type="submit" style={{ width: '100%', padding: '10px' }}>
-            Login
+
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+
+          <button type="submit" disabled={loading} className="login-btn">
+            {loading ? (
+              <>
+                <span className="spinner"></span>
+                Logging in...
+              </>
+            ) : 'Login'}
           </button>
         </form>
+
+        <div className="demo-accounts">
+          <p><strong>Demo Accounts:</strong></p>
+          <p>Member: josh / pass</p>
+          <p>Staff: admin / pass</p>
+        </div>
       </div>
-    </>
-  )
+    </div>
+  );
 }
 
 export default Login;
