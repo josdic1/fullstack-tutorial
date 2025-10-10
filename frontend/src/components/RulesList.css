@@ -1,0 +1,291 @@
+/* src/components/RulesList.css */
+
+
+
+.rules-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.rules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.rules-header h1 {
+  font-size: 2rem;
+  color: #333;
+}
+
+/* Controls */
+.rules-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.filter-group, .sort-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-group label, .sort-group label {
+  font-weight: 600;
+  color: #555;
+}
+
+.filter-group button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-group button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.filter-group button:hover {
+  background: #e9ecef;
+}
+
+.filter-group button.active:hover {
+  background: #0056b3;
+}
+
+.sort-group select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sort-toggle {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.sort-toggle:hover {
+  background: #e9ecef;
+}
+
+/* Table - FIXED WIDTHS */
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  table-layout: fixed; /* ← FIX: Makes columns even */
+}
+
+.rules-table thead {
+  background: #343a40;
+  color: white;
+}
+
+.rules-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+/* Set specific column widths */
+.rules-table th:nth-child(1) { width: 10%; } /* Status toggle */
+.rules-table th:nth-child(2) { width: 20%; } /* Rule Name */
+.rules-table th:nth-child(3) { width: 35%; } /* Description */
+.rules-table th:nth-child(4) { width: 15%; } /* Fee Amount */
+.rules-table th:nth-child(5) { width: 20%; } /* Actions */
+
+.rules-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle; /* ← FIX: Vertical alignment */
+}
+
+.rules-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.rules-table tbody tr.inactive-row {
+  opacity: 0.6;
+}
+
+.rule-name {
+  font-weight: 600;
+  color: #495057;
+}
+
+.rule-description {
+  color: #6c757d;
+}
+
+.fee-amount {
+  font-weight: 600;
+  color: #28a745;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #28a745;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* Action Buttons - FIXED COLORS */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center; /* ← Center the buttons */
+}
+
+.btn-edit, .btn-delete {
+  padding: 0.5rem 1rem; /* ← Slightly bigger padding */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600; /* ← Make text bold */
+  transition: all 0.2s;
+}
+
+.btn-edit {
+  background: #007bff; /* ← Blue stays */
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #0056b3;
+  transform: translateY(-1px); /* ← Subtle lift effect */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-delete {
+  background: #dc3545; /* ← Red stays */
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+  transform: translateY(-1px); /* ← Subtle lift effect */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Loading/Error */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.error {
+  padding: 1rem;
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+

@@ -2,136 +2,157 @@ import { useState, useEffect, useContext } from "react"
 import AuthContext from "../contexts/AuthContext"
 import RulesContext from "../contexts/RulesContext"
 
-function RulesProvider({children}) {
-    const { token, user } = useContext(AuthContext)  // ✅ Only declare once
-    const [rules, setRules] = useState([])
-    const [error, setError] = useState(null)
+function RulesProvider({ children }) {
+  const [rules, setRules] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const fetchRules = async () => {
-        if (!token || !user) {
-            console.log('Skipping fetch - no token or user yet')
-            return
-        }
-        
-        try {
-            const response = await fetch('http://localhost:5555/api/rules', {
-                headers: { "Authorization": `Bearer ${token}` }
-            })
-            
-            if (response.ok) {
-                const data = await response.json()
-                setRules(data.rules)
-                setError(null)
-            }
-        } catch (error) {
-            console.error('Error:', error)
-            setError('Cannot connect to server')
-        }
-    }
-
-    useEffect(() => {
-        fetchRules()
-    }, [token, user])
-
-    const createRule = async (rulesData) => {
+  const API_URL = 'http://localhost:5555/api';
   
-        try {
-            const response = await fetch('http://localhost:5555/api/rules', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(rulesData)
-            })
-            
-            if (response.ok) {
-                const { rule } = await response.json()
-                setRules(prev => [...prev, rule])
-                return true
-            }
-            return false
-        } catch (error) {
-            console.error('Error creating rule:', error)
-            return false
-        }
-    }
-
-    const updateRule = async (updatedData) => {
-        try {
-            const response = await fetch(`http://localhost:5555/api/rules/${updatedData.id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(updatedData)
-            })
-            
-            if (response.ok) {
-                const { rule } = await response.json()
-                setRules(prev => prev.map(r => r.id === updatedData.id ? rule : r))
-                return true
-            }
-            
-            console.error('Update failed:', response.status)
-            return false
-            
-        } catch (error) {
-            console.error('Error updating rule:', error)
-            return false
-        }
-    }
-
-    const toggleRuleActive = async (ruleId, currentStatus) => {
+  // Helper to get auth headers with JWT token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');  // ← Change from 'access_token' to 'token'
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+};
+  // Fetch rules with filters and sorting
+  const fetchRules = async (filters = {}) => {
+    setLoading(true);
+    setError(null);
+    
     try {
-        const response = await fetch(`http://localhost:5555/api/rules/${ruleId}/is_active`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ is_active: !currentStatus })
-        })
-        
-        if (response.ok) {
-            const { rule } = await response.json()
-            setRules(prev => prev.map(r => r.id === ruleId ? rule : r))
-            return true
-        }
-        return false
-    } catch (error) {
-        console.error('Error toggling rule:', error)
-        return false
-    }
-}
+      const params = new URLSearchParams();
+      if (filters.status) params.append('status', filters.status);
+      if (filters.sort) params.append('sort', filters.sort);
+      if (filters.order) params.append('order', filters.order);
 
-    const deleteRule = async (id) => {
-        try {
-            const response = await fetch(`http://localhost:5555/api/rules/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            })
-            
-            if (response.ok) {
-                setRules(prev => prev.filter(r => r.id !== id))
-                return true
-            }
-            return false
-        } catch (error) {
-            console.error('Error deleting rule:', error)
-            return false
-        }
+      const response = await fetch(`${API_URL}/rules?${params}`, {
+        headers: getAuthHeaders()  // ← ADD THIS
+      });
+      if (!response.ok) throw new Error('Failed to fetch rules');
+      
+      const data = await response.json();
+      setRules(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    return (
-        <RulesContext.Provider 
-            value={{ rules, error, fetchRules, createRule, updateRule, deleteRule }}>
-            {children}
-        </RulesContext.Provider>
-    )
-}
+  // Create rule
+  const createRule = async (ruleData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${API_URL}/rules`, {
+        method: 'POST',
+        headers: getAuthHeaders(),  // ← CHANGE THIS
+        body: JSON.stringify(ruleData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create rule');
+      }
+      
+      const newRule = await response.json();
+      setRules(prev => [...prev, newRule]);
+      return newRule;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update rule
+  const updateRule = async (ruleId, ruleData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${API_URL}/rules/${ruleId}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),  // ← CHANGE THIS
+        body: JSON.stringify(ruleData)
+      });
+      
+      if (!response.ok) throw new Error('Failed to update rule');
+      
+      const updatedRule = await response.json();
+      setRules(prev => prev.map(r => r.id === ruleId ? updatedRule : r));
+      return updatedRule;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Toggle rule active status
+  const toggleRule = async (ruleId) => {
+    try {
+      const response = await fetch(`${API_URL}/rules/${ruleId}/toggle`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()  // ← ADD THIS
+      });
+      
+      if (!response.ok) throw new Error('Failed to toggle rule');
+      
+      const updatedRule = await response.json();
+      setRules(prev => prev.map(r => 
+        r.id === ruleId ? { ...r, is_active: updatedRule.is_active } : r
+      ));
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Delete rule
+  const deleteRule = async (ruleId) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${API_URL}/rules/${ruleId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()  // ← ADD THIS
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete rule');
+      
+      setRules(prev => prev.filter(r => r.id !== ruleId));
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const value = {
+    rules,
+    loading,
+    error,
+    fetchRules,
+    createRule,
+    updateRule,
+    toggleRule,
+    deleteRule
+  };
+
+  return (
+    <RulesContext.Provider value={value}>
+      {children}
+    </RulesContext.Provider>
+  );
+};
 
 export default RulesProvider

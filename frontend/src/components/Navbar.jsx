@@ -4,8 +4,12 @@ import AuthContext from '../contexts/AuthContext'
 
 function Navbar() {
   const { user, logout } = useContext(AuthContext)
-
   const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');  // ← Navigate after logout
+  };
 
   return (
     <nav style={{ 
@@ -30,7 +34,7 @@ function Navbar() {
              {user.role === 'staff' ? <button onClick={() => navigate('rules')} style={{ padding: '5px 15px' }}>
               Rules
             </button> : console.log('hiding rules nav from user')}
-            <button onClick={logout} style={{ padding: '5px 15px' }}>
+            <button onClick={handleLogout} style={{ padding: '5px 15px' }}>
               Logout
             </button>
           </div>

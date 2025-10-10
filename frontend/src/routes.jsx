@@ -8,6 +8,7 @@ import ReservationsItem from "./pages/ReservationsItem"
 import ReservationsPage from "./pages/ReservationsPage"
 import RulesList from "./components/RulesList"
 
+
 const routes = [
   { 
     path: "/", 

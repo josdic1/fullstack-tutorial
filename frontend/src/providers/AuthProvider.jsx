@@ -78,6 +78,7 @@ function AuthProvider({ children }) {
     setUser(null)
     setToken(null)
     localStorage.removeItem('token')
+    
   }
 
 if (loading) {
