@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: catering-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build && cp public/_redirects dist/_redirects
+    staticPublishPath: frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
